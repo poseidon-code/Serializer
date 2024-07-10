@@ -1,150 +1,108 @@
 #pragma once
 
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
-#include <string>
 #include <vector>
 
 
+enum Endianness {
+    BO_LITTLE_ENDIAN,
+    BO_BIG_ENDIAN
+};
+
+
 namespace serializer {
-    enum Endianness {
-        BO_LITTLE_ENDIAN,
-        BO_BIG_ENDIAN
+    constexpr bool _is_system_little_endian() {
+        union {int16_t value; uint8_t bytes[sizeof(value)];} x;
+        x.value = 1;
+        return x.bytes[0] == 1;
+    };
+
+    void _serialize(uint8_t* stream, const uint8_t* bytes, uint8_t byte_size, size_t index_start, Endianness endianness);
+    void _deserialize(const uint8_t* stream, uint8_t* bytes, uint8_t byte_size, size_t index_start, Endianness endianness);
+
+
+    template <typename T, Endianness endianness = Endianness::BO_BIG_ENDIAN>
+    class byte_t {
+    private:
+        const uint8_t byte_size = sizeof(T);
+
+        union {
+            T value;
+            uint8_t bytes[sizeof(T)];
+        } t;
+
+    public:
+        void serialize(uint8_t* stream, T value, size_t index_start = 0) {
+            this->t.value = value;
+            _serialize(stream, this->t.bytes, this->byte_size, index_start, endianness);
+        }
+
+        void serialize(std::vector<uint8_t>& stream, T value, size_t index_start = 0) {
+            this->serialize(stream.data(), value, index_start);
+        }
+
+        std::vector<uint8_t> serialize(T value) {
+            std::vector<uint8_t> buffer(this->byte_size, 0x00);
+            this->serialize(buffer.data(), value, 0);
+            return buffer;
+        }
+
+        T deserialize(const uint8_t* stream, size_t index_start = 0) {
+            this->t.value = 0;
+            _deserialize(stream, this->t.bytes, this->byte_size, index_start, endianness);
+            return t.value;
+        }
+
+        T deserialize(const std::vector<uint8_t>& stream, size_t index_start = 0) {
+            return this->deserialize(stream.data(), index_start);
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const byte_t& byte) {
+            os << "0x ";
+            os << std::hex << std::uppercase << std::setfill('0');
+            for (uint8_t i = 0; i < byte.byte_size; ++i) {
+                if (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
+                    os << std::setw(2) << static_cast<uint16_t>(byte.t.bytes[i]);
+                } else {
+                    os << std::setw(2) << static_cast<uint16_t>(byte.t.bytes[byte.byte_size - 1 - i]);
+                }
+
+                if (i != byte.byte_size - 1) os << " ";
+            }
+            os << std::dec << std::nouppercase << std::setfill(' ');
+            return os;
+        }
     };
 
 
     class stream {
     private:
-        std::vector<unsigned char> buffer;
+        std::vector<uint8_t> buffer;
         size_t index;
 
     public:
         stream() = delete;
         stream(size_t length);
+        stream(const stream& other);
+        stream(stream&& other) noexcept;
+        stream& operator=(const stream& other);
+        stream& operator=(stream&& other) noexcept;
+        ~stream() = default;
 
-        std::vector<unsigned char> const get() const;
-        stream& operator<<(const std::vector<unsigned char>& buffer);
-        void put(const std::vector<unsigned char>& buffer, size_t index_start = 0);
-        void put(const unsigned char* buffer, size_t length, size_t index_start = 0);
+        std::vector<uint8_t> const get() const;
+        stream& operator<<(const std::vector<uint8_t>& buffer);
+        void put(const uint8_t* buffer, size_t length, size_t index_start = 0);
+        void put(const std::vector<uint8_t>& buffer, size_t index_start = 0);
     };
 
 
-    class byte_8 {
-    private:
-        Endianness endianness;
-        const uint8_t byte_size = 8;
 
-        union {
-            int64_t value;
-            unsigned char bytes[8];
-        } t;
-
-    public:
-        byte_8(Endianness endianness = Endianness::BO_BIG_ENDIAN);
-
-        std::vector<unsigned char> serialize(int64_t value);
-        void serialize(unsigned char* stream, int64_t value, size_t index_start = 0);
-        void serialize(std::vector<unsigned char>& stream, int64_t value, size_t index_start = 0);
-        int64_t deserialize(const unsigned char* stream, size_t index_start = 0);
-        int64_t deserialize(const std::vector<unsigned char>& stream, size_t index_start = 0);
-        friend std::ostream& operator<<(std::ostream& os, const byte_8& byte);
-    };
-
-    std::ostream& operator<<(std::ostream& os, const byte_8& byte);
-
-
-    class byte_4 {
-    private:
-        Endianness endianness;
-        const uint8_t byte_size = 4;
-
-        union {
-            int32_t value;
-            unsigned char bytes[4];
-        } t;
-
-    public:
-        byte_4(Endianness endianness = Endianness::BO_BIG_ENDIAN);
-
-        std::vector<unsigned char> serialize(int32_t value);
-        void serialize(unsigned char* stream, int32_t value, size_t index_start = 0);
-        void serialize(std::vector<unsigned char>& stream, int32_t value, size_t index_start = 0);
-        int32_t deserialize(const unsigned char* stream, size_t index_start = 0);
-        int32_t deserialize(const std::vector<unsigned char>& stream, size_t index_start = 0);
-        friend std::ostream& operator<<(std::ostream& os, const byte_4& byte);
-    };
-
-    std::ostream& operator<<(std::ostream& os, const byte_4& byte);
-
-
-    class byte_2 {
-    private:
-        Endianness endianness;
-        const uint8_t byte_size = 2;
-
-        union {
-            int16_t value;
-            unsigned char bytes[2];
-        } t;
-
-    public:
-        byte_2(Endianness endianness = Endianness::BO_BIG_ENDIAN);
-
-        std::vector<unsigned char> serialize(int16_t value);
-        void serialize(unsigned char* stream, int16_t value, size_t index_start = 0);
-        void serialize(std::vector<unsigned char>& stream, int16_t value, size_t index_start = 0);
-        int16_t deserialize(const unsigned char* stream, size_t index_start = 0);
-        int16_t deserialize(const std::vector<unsigned char>& stream, size_t index_start = 0);
-        friend std::ostream& operator<<(std::ostream& os, const byte_2& byte);
-    };
-
-    std::ostream& operator<<(std::ostream& os, const byte_2& byte);
-
-
-    class byte_1 {
-    private:
-        Endianness endianness;
-        const uint8_t byte_size = 1;
-
-        union {
-            int8_t value;
-            unsigned char bytes[1];
-        } t;
-
-    public:
-        byte_1(Endianness endianness = Endianness::BO_BIG_ENDIAN);
-
-        std::vector<unsigned char> serialize(int8_t value);
-        void serialize(unsigned char* stream, int8_t value, size_t index_start = 0);
-        void serialize(std::vector<unsigned char>& stream, int8_t value, size_t index_start = 0);
-        int8_t deserialize(const unsigned char* stream, size_t index_start = 0);
-        int8_t deserialize(const std::vector<unsigned char>& stream, size_t index_start = 0);
-        friend std::ostream& operator<<(std::ostream& os, const byte_1& byte);
-    };
-
-    std::ostream& operator<<(std::ostream& os, const byte_1& byte);
-
-
-    void print(const unsigned char* stream, int length, std::string delimeter = " ");
-    void print(const std::vector<unsigned char>& stream, std::string delimeter = " ");
+    void print(const uint8_t* stream, size_t length, std::string delimeter = " ");
+    void print(const std::vector<uint8_t>& stream, std::string delimeter = " ");
     void print(const serializer::stream& stream, std::string delimeter = " ");
-    std::string sprint(const unsigned char* stream, int length, std::string delimeter = " ");
-    std::string sprint(const std::vector<unsigned char>& stream, std::string delimeter = " ");
+    std::string sprint(const uint8_t* stream, size_t length, std::string delimeter = " ");
+    std::string sprint(const std::vector<uint8_t>& stream, std::string delimeter = " ");
     std::string sprint(const serializer::stream& stream, std::string delimeter = " ");
 }
-
-void _serialize(
-    unsigned char* stream,
-    unsigned char* bytes,
-    uint8_t byte_size,
-    uint index_start = 0,
-    serializer::Endianness endianness = serializer::Endianness::BO_BIG_ENDIAN
-);
-
-void _deserialize(
-    const unsigned char* stream,
-    unsigned char* bytes,
-    uint8_t byte_size,
-    uint index_start = 0,
-    serializer::Endianness endianness = serializer::Endianness::BO_BIG_ENDIAN
-);
