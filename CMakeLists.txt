@@ -11,12 +11,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(LIBSERIALIZER_SOURCES
     "src/serializer.cpp"
     "src/stream.cpp"
-    "src/byte_8.cpp"
-    "src/byte_4.cpp"
-    "src/byte_2.cpp"
-    "src/byte_1.cpp"
 )
-set(LIBSERIALIZER_INCLUDE_DIRECTORIES 
+set(LIBSERIALIZER_INCLUDE_DIRECTORIES
     "include/"
 )
 
