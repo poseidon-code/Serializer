@@ -12,9 +12,9 @@ A binary data serializer in modern C++. Encodes & Decodes data to/from bytes wit
 #include "serializer.hpp"
 
 int main() {
-    const uint stream_length = 16;
+    const size_t stream_length = 16;
     unsigned char stream[stream_length] = {0}; // create the bytes array
-    serializer::byte_8 byte_8; // create a default serializer object (Big Endian)
+    serializer::byte_t<int64_t> byte_8; // create a default serializer object (Big Endian) of 8 bytes
 
     byte_8.serialize(stream, 0x1122334455667788); // serialize the data and start putting it from 0 index of bytes array
     std::cout << byte_8 << "\n"; // prints the current data of the serializer object
@@ -44,9 +44,9 @@ int main() {
 #include "serializer.hpp"
 
 int main() {
-    const uint stream_length = 16;
+    const size_t stream_length = 16;
     std::vector<unsigned char> stream(16, 0x00); // create bytes vector with size & default values
-    serializer::byte_8 byte_8(serializer::Endianness::BO_LITTLE_ENDIAN); // create a serializer object
+    serializer::byte_t<int64_t, Endianness::BO_LITTLE_ENDIAN> byte_8; // create a serializer object (Little Endian) of 8 bytes
 
     byte_8.serialize(stream, 0x1122334455667788); // serialize the data and start putting it from 0 index of bytes vector
     std::cout << byte_8 << "\n"; // prints the current data of the serializer object
@@ -76,9 +76,9 @@ int main() {
 #include "serializer.hpp"
 
 int main() {
-    const uint stream_length = 16;
+    const size_t stream_length = 16;
     serializer::stream stream(stream_length); // create a stream object with length
-    serializer::byte_8 byte_8(serializer::Endianness::BO_BIG_ENDIAN); // create a serializer object
+    serializer::byte_t<int64_t, Endianness::BO_BIG_ENDIAN> byte_8; // create a serializer object (Big Endian) of 8 bytes
 
     stream << byte_8.serialize(0x1122334455667788); // serialize the data and put it into the stream after previous
     std::cout << byte_8 << "\n"; // prints the current data of the serializer object
