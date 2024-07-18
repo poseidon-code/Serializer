@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-Name : Pritam Halder
+Author : Pritam Halder
 Email : pritamhalder.portfolio@gmail.com
 */
 
@@ -28,25 +28,6 @@ Email : pritamhalder.portfolio@gmail.com
 #include <vector>
 
 #include "serializer.hpp"
-
-
-
-void serializer::_serialize(uint8_t* stream, const uint8_t* bytes, uint8_t byte_size, size_t index_start, Endianness endianness) {
-    if (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
-        std::copy(bytes, bytes + byte_size, stream + index_start);
-    } else {
-        std::reverse_copy(bytes, bytes + byte_size, stream + index_start);
-    }
-}
-
-
-void serializer::_deserialize(const uint8_t* stream, uint8_t* bytes, uint8_t byte_size, size_t index_start, Endianness endianness) {
-    if (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
-        std::copy(stream + index_start, stream + index_start + byte_size, bytes);
-    } else {
-        std::reverse_copy(stream + index_start, stream + index_start + byte_size, bytes);
-    }
-}
 
 
 void serializer::print(const uint8_t* stream, size_t length, std::string delimeter) {
