@@ -93,22 +93,6 @@ namespace serializer {
         T deserialize(const std::vector<uint8_t>& stream, size_t index_start = 0) {
             return this->deserialize(stream.data(), index_start);
         }
-
-        friend std::ostream& operator<<(std::ostream& os, const byte_t& byte) {
-            os << "0x ";
-            os << std::hex << std::uppercase << std::setfill('0');
-            for (uint8_t i = 0; i < byte.byte_size; ++i) {
-                if (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
-                    os << std::setw(2) << static_cast<uint16_t>(byte.t.bytes[i]);
-                } else {
-                    os << std::setw(2) << static_cast<uint16_t>(byte.t.bytes[byte.byte_size - 1 - i]);
-                }
-
-                if (i != byte.byte_size - 1) os << " ";
-            }
-            os << std::dec << std::nouppercase << std::setfill(' ');
-            return os;
-        }
     };
 
 
