@@ -45,15 +45,15 @@ namespace serializer {
     template <typename T, Endianness endianness = Endianness::BO_BIG_ENDIAN>
     class byte_t {
     private:
-        const uint8_t byte_size = sizeof(T);
+        static const uint8_t byte_size = sizeof(T);
 
-        union {
+        static union {
             T value;
             uint8_t bytes[sizeof(T)];
         } t;
 
     public:
-        void serialize(uint8_t* stream, T value, size_t index_start = 0) {
+        static void serialize(uint8_t* stream, T value, size_t index_start = 0) {
             static auto _serialize = [](uint8_t* stream, const uint8_t* bytes, uint8_t byte_size, size_t index_start) {
                 if (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
                     std::copy(bytes, bytes + byte_size, stream + index_start);
@@ -62,21 +62,21 @@ namespace serializer {
                 }
             };
 
-            this->t.value = value;
-            _serialize(stream, this->t.bytes, this->byte_size, index_start);
+            t.value = value;
+            _serialize(stream, t.bytes, byte_size, index_start);
         }
 
-        void serialize(std::vector<uint8_t>& stream, T value, size_t index_start = 0) {
-            this->serialize(stream.data(), value, index_start);
+        static void serialize(std::vector<uint8_t>& stream, T value, size_t index_start = 0) {
+            serialize(stream.data(), value, index_start);
         }
 
-        std::vector<uint8_t> serialize(T value) {
-            std::vector<uint8_t> buffer(this->byte_size, 0x00);
-            this->serialize(buffer.data(), value, 0);
+        static std::vector<uint8_t> serialize(T value) {
+            std::vector<uint8_t> buffer(byte_size, 0x00);
+            serialize(buffer.data(), value, 0);
             return buffer;
         }
 
-        T deserialize(const uint8_t* stream, size_t index_start = 0) {
+        static T deserialize(const uint8_t* stream, size_t index_start = 0) {
             static auto _deserialize = [](const uint8_t* stream, uint8_t* bytes, uint8_t byte_size, size_t index_start) {
                 if (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
                     std::copy(stream + index_start, stream + index_start + byte_size, bytes);
@@ -85,13 +85,13 @@ namespace serializer {
                 }
             };
 
-            this->t.value = 0;
-            _deserialize(stream, this->t.bytes, this->byte_size, index_start);
+            t.value = 0;
+            _deserialize(stream, t.bytes, byte_size, index_start);
             return t.value;
         }
 
-        T deserialize(const std::vector<uint8_t>& stream, size_t index_start = 0) {
-            return this->deserialize(stream.data(), index_start);
+        static T deserialize(const std::vector<uint8_t>& stream, size_t index_start = 0) {
+            return deserialize(stream.data(), index_start);
         }
     };
 
