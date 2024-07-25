@@ -96,6 +96,29 @@ namespace serializer {
     };
 
 
+    static byte_t<uint8_t, Endianness::BO_BIG_ENDIAN> ubyte_1_be;
+    static byte_t<uint16_t, Endianness::BO_BIG_ENDIAN> ubyte_2_be;
+    static byte_t<uint32_t, Endianness::BO_BIG_ENDIAN> ubyte_4_be;
+    static byte_t<uint64_t, Endianness::BO_BIG_ENDIAN> ubyte_8_be;
+    static byte_t<int8_t, Endianness::BO_BIG_ENDIAN> byte_1_be;
+    static byte_t<int16_t, Endianness::BO_BIG_ENDIAN> byte_2_be;
+    static byte_t<int32_t, Endianness::BO_BIG_ENDIAN> byte_4_be;
+    static byte_t<int64_t, Endianness::BO_BIG_ENDIAN> byte_8_be;
+    static byte_t<float, Endianness::BO_BIG_ENDIAN> fpbyte_4_be;
+    static byte_t<double, Endianness::BO_BIG_ENDIAN> fpbyte_8_be;
+
+    static byte_t<uint8_t, Endianness::BO_LITTLE_ENDIAN> ubyte_1_le;
+    static byte_t<uint16_t, Endianness::BO_LITTLE_ENDIAN> ubyte_2_le;
+    static byte_t<uint32_t, Endianness::BO_LITTLE_ENDIAN> ubyte_4_le;
+    static byte_t<uint64_t, Endianness::BO_LITTLE_ENDIAN> ubyte_8_le;
+    static byte_t<int8_t, Endianness::BO_LITTLE_ENDIAN> byte_1_le;
+    static byte_t<int16_t, Endianness::BO_LITTLE_ENDIAN> byte_2_le;
+    static byte_t<int32_t, Endianness::BO_LITTLE_ENDIAN> byte_4_le;
+    static byte_t<int64_t, Endianness::BO_LITTLE_ENDIAN> byte_8_le;
+    static byte_t<float, Endianness::BO_LITTLE_ENDIAN> fpbyte_4_le;
+    static byte_t<double, Endianness::BO_LITTLE_ENDIAN> fpbyte_8_le;
+
+
     class stream {
     private:
         std::vector<uint8_t> buffer;
