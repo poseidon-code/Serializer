@@ -22,12 +22,19 @@ Email : pritamhalder.portfolio@gmail.com
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <vector>
+
+#if defined(__cpp_concepts)
+#include <concepts>
+#endif
+
 
 
 enum Endianness {
@@ -36,25 +43,40 @@ enum Endianness {
 };
 
 
+#if defined(__cpp_concepts)
+template <typename T>
+concept serializable = std::is_arithmetic_v<T> || std::is_enum_v<T>;
 
-namespace serializer {
-    constexpr bool _is_system_little_endian() {
-        union {int16_t value; uint8_t bytes[sizeof(value)];} x;
+template <typename T>
+concept integral = std::integral<T>;
+#else
+template <typename T>
+using enable_if_serializable = typename std::enable_if<std::integral_constant<bool, std::is_arithmetic<T>::value || std::is_enum<T>::value>::value, int>::type;
+
+template <typename T>
+using enable_if_integral = typename std::enable_if<std::is_integral<T>::value, int>::type;
+#endif
+
+
+
+
+class serializer {
+private:
+    static constexpr bool _is_system_little_endian() {
+        union {int16_t value; uint8_t bytes[sizeof(value)];} x{};
         x.value = 1;
         return x.bytes[0] == 1;
     };
 
 
-
-    template <typename T, Endianness endianness = Endianness::BO_BIG_ENDIAN>
-    class byte_t {
+    template <
+        typename T, 
+        Endianness endianness = Endianness::BO_BIG_ENDIAN
+    >
+    class byte_t_base {
     private:
-        static const uint8_t byte_size = sizeof(T);
-
-        static union {
-            T value;
-            uint8_t bytes[sizeof(T)];
-        } t;
+        const uint8_t byte_size = sizeof(T);
+        union {T value; uint8_t bytes[sizeof(T)];} byte_split;
 
         static void _serialize(uint8_t* stream, const uint8_t* bytes, uint8_t byte_size, size_t index_start) {
             if constexpr (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
@@ -73,54 +95,73 @@ namespace serializer {
         };
 
     public:
-        static void serialize(uint8_t* stream, T value, size_t index_start = 0) {
-            t.value = value;
-            _serialize(stream, t.bytes, byte_size, index_start);
+        void serialize(uint8_t* stream, T value, size_t index_start = 0) {
+            this->byte_split.value = value;
+            _serialize(stream, this->byte_split.bytes, this->byte_size, index_start);
         }
 
-        static void serialize(std::vector<uint8_t>& stream, T value, size_t index_start = 0) {
+        void serialize(std::vector<uint8_t>& stream, T value, size_t index_start = 0) {
             serialize(stream.data(), value, index_start);
         }
 
-        static std::vector<uint8_t> serialize(T value) {
-            std::vector<uint8_t> buffer(byte_size, 0x00);
+        std::vector<uint8_t> serialize(T value) {
+            std::vector<uint8_t> buffer(this->byte_size, 0x00);
             serialize(buffer.data(), value, 0);
             return buffer;
         }
 
-        static T deserialize(const uint8_t* stream, size_t index_start = 0) {
-            t.value = 0;
-            _deserialize(stream, t.bytes, byte_size, index_start);
-            return t.value;
+        T deserialize(const uint8_t* stream, size_t index_start = 0) {
+            this->byte_split.value = 0;
+            _deserialize(stream, this->byte_split.bytes, this->byte_size, index_start);
+            return this->byte_split.value;
         }
 
-        static T deserialize(const std::vector<uint8_t>& stream, size_t index_start = 0) {
+        T deserialize(const std::vector<uint8_t>& stream, size_t index_start = 0) {
             return deserialize(stream.data(), index_start);
         }
     };
 
+public:
+    #if defined(__cpp_concepts)
+    template <
+        serializable T, 
+        Endianness endianness = Endianness::BO_BIG_ENDIAN
+    >
+    class byte_t : public byte_t_base<T, endianness> {};
 
-    static byte_t<uint8_t, Endianness::BO_BIG_ENDIAN> ubyte_1_be;
-    static byte_t<uint16_t, Endianness::BO_BIG_ENDIAN> ubyte_2_be;
-    static byte_t<uint32_t, Endianness::BO_BIG_ENDIAN> ubyte_4_be;
-    static byte_t<uint64_t, Endianness::BO_BIG_ENDIAN> ubyte_8_be;
-    static byte_t<int8_t, Endianness::BO_BIG_ENDIAN> byte_1_be;
-    static byte_t<int16_t, Endianness::BO_BIG_ENDIAN> byte_2_be;
-    static byte_t<int32_t, Endianness::BO_BIG_ENDIAN> byte_4_be;
-    static byte_t<int64_t, Endianness::BO_BIG_ENDIAN> byte_8_be;
-    static byte_t<float, Endianness::BO_BIG_ENDIAN> fpbyte_4_be;
-    static byte_t<double, Endianness::BO_BIG_ENDIAN> fpbyte_8_be;
+    template <integral T>
+    float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
 
-    static byte_t<uint8_t, Endianness::BO_LITTLE_ENDIAN> ubyte_1_le;
-    static byte_t<uint16_t, Endianness::BO_LITTLE_ENDIAN> ubyte_2_le;
-    static byte_t<uint32_t, Endianness::BO_LITTLE_ENDIAN> ubyte_4_le;
-    static byte_t<uint64_t, Endianness::BO_LITTLE_ENDIAN> ubyte_8_le;
-    static byte_t<int8_t, Endianness::BO_LITTLE_ENDIAN> byte_1_le;
-    static byte_t<int16_t, Endianness::BO_LITTLE_ENDIAN> byte_2_le;
-    static byte_t<int32_t, Endianness::BO_LITTLE_ENDIAN> byte_4_le;
-    static byte_t<int64_t, Endianness::BO_LITTLE_ENDIAN> byte_8_le;
-    static byte_t<float, Endianness::BO_LITTLE_ENDIAN> fpbyte_4_le;
-    static byte_t<double, Endianness::BO_LITTLE_ENDIAN> fpbyte_8_le;
+    template <integral T>
+    double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
+
+    template <integral T>
+    T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
+
+    template <integral T>
+    T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
+    
+    #else 
+    
+    template <
+        typename T, 
+        Endianness endianness = Endianness::BO_BIG_ENDIAN,
+        enable_if_serializable<T> = 0
+    >
+    class byte_t : public byte_t_base<T, endianness> {};
+
+    template <typename T, enable_if_integral<T> = 0>
+    float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
+
+    template <typename T, enable_if_integral<T> = 0>
+    double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
+
+    template <typename T, enable_if_integral<T> = 0>
+    T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
+
+    template <typename T, enable_if_integral<T> = 0>
+    T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
+    #endif
 
 
 
@@ -185,22 +226,22 @@ namespace serializer {
 
 
 
-    void print(const uint8_t* stream, size_t length, std::string delimeter = " ") {
+    static void print(const uint8_t* stream, size_t length, std::string delimeter = " ") {
         std::cout << std::hex << std::uppercase << std::setfill('0');
         for (size_t i = 0; i < length; ++i)
             std::cout << std::setw(2)  << static_cast<uint>(stream[i]) << (i == length - 1 ? "" : delimeter);
         std::cout << std::dec << std::nouppercase << std::setfill(' ');
     }
 
-    void print(const std::vector<uint8_t>& stream, std::string delimeter = " ") {
+    static void print(const std::vector<uint8_t>& stream, std::string delimeter = " ") {
         print(stream.data(), stream.size(), delimeter);
     }
 
-    void print(const serializer::stream& stream, std::string delimeter = " ") {
+    static void print(const serializer::stream& stream, std::string delimeter = " ") {
         print(stream.get().data(), stream.get().size(), delimeter);
     }
 
-    std::string sprint(const uint8_t* stream, size_t length, std::string delimeter = " ") {
+    static std::string sprint(const uint8_t* stream, size_t length, std::string delimeter = " ") {
         std::ostringstream oss;
         oss << std::hex << std::uppercase << std::setfill('0');
         for (size_t i = 0; i < length; ++i)
@@ -209,11 +250,34 @@ namespace serializer {
         return oss.str();
     }
 
-    std::string sprint(const std::vector<uint8_t>& stream, std::string delimeter = " ") {
+    static std::string sprint(const std::vector<uint8_t>& stream, std::string delimeter = " ") {
         return sprint(stream.data(), stream.size(), delimeter);
     }
 
-    std::string sprint(const serializer::stream& stream, std::string delimeter = " ") {
+    static std::string sprint(const serializer::stream& stream, std::string delimeter = " ") {
         return sprint(stream.get().data(), stream.get().size(), delimeter);
     }
-}
+};
+
+
+static serializer::byte_t<uint8_t, Endianness::BO_BIG_ENDIAN>       ubyte_1_be;
+static serializer::byte_t<uint16_t, Endianness::BO_BIG_ENDIAN>      ubyte_2_be;
+static serializer::byte_t<uint32_t, Endianness::BO_BIG_ENDIAN>      ubyte_4_be;
+static serializer::byte_t<uint64_t, Endianness::BO_BIG_ENDIAN>      ubyte_8_be;
+static serializer::byte_t<int8_t, Endianness::BO_BIG_ENDIAN>        byte_1_be;
+static serializer::byte_t<int16_t, Endianness::BO_BIG_ENDIAN>       byte_2_be;
+static serializer::byte_t<int32_t, Endianness::BO_BIG_ENDIAN>       byte_4_be;
+static serializer::byte_t<int64_t, Endianness::BO_BIG_ENDIAN>       byte_8_be;
+static serializer::byte_t<float, Endianness::BO_BIG_ENDIAN>         fpbyte_4_be;
+static serializer::byte_t<double, Endianness::BO_BIG_ENDIAN>        fpbyte_8_be;
+
+static serializer::byte_t<uint8_t, Endianness::BO_LITTLE_ENDIAN>    ubyte_1_le;
+static serializer::byte_t<uint16_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_2_le;
+static serializer::byte_t<uint32_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_4_le;
+static serializer::byte_t<uint64_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_8_le;
+static serializer::byte_t<int8_t, Endianness::BO_LITTLE_ENDIAN>     byte_1_le;
+static serializer::byte_t<int16_t, Endianness::BO_LITTLE_ENDIAN>    byte_2_le;
+static serializer::byte_t<int32_t, Endianness::BO_LITTLE_ENDIAN>    byte_4_le;
+static serializer::byte_t<int64_t, Endianness::BO_LITTLE_ENDIAN>    byte_8_le;
+static serializer::byte_t<float, Endianness::BO_LITTLE_ENDIAN>      fpbyte_4_le;
+static serializer::byte_t<double, Endianness::BO_LITTLE_ENDIAN>     fpbyte_8_le;

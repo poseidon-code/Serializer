@@ -25,6 +25,8 @@ Email : pritamhalder.portfolio@gmail.com
 
 #include "serializer.hpp"
 
+
+
 serializer::stream::stream(size_t length)
     : buffer(length, 0x00), index(0)
 {}

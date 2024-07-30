@@ -47,6 +47,7 @@ void serializer::print(const serializer::stream& stream, std::string delimeter) 
     serializer::print(stream.get().data(), stream.get().size(), delimeter);
 }
 
+
 std::string serializer::sprint(const uint8_t* stream, size_t length, std::string delimeter) {
     std::ostringstream oss;
     oss << std::hex << std::uppercase << std::setfill('0');
