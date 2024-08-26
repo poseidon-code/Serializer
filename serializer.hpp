@@ -130,16 +130,16 @@ public:
     class byte_t : public byte_t_base<T, endianness> {};
 
     template <integral T>
-    float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
+    static float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
 
     template <integral T>
-    double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
+    static double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
 
     template <integral T>
-    T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
+    static T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
 
     template <integral T>
-    T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
+    static T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
     
     #else 
     
@@ -151,16 +151,16 @@ public:
     class byte_t : public byte_t_base<T, endianness> {};
 
     template <typename T, enable_if_integral<T> = 0>
-    float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
+    static float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
 
     template <typename T, enable_if_integral<T> = 0>
-    double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
+    static double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
 
     template <typename T, enable_if_integral<T> = 0>
-    T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
+    static T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
 
     template <typename T, enable_if_integral<T> = 0>
-    T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
+    static T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
     #endif
 
 
