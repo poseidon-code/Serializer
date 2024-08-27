@@ -31,10 +31,6 @@ Email : pritamhalder.portfolio@gmail.com
 #include <type_traits>
 #include <vector>
 
-#if defined(__cpp_concepts)
-#include <concepts>
-#endif
-
 
 
 enum Endianness {
@@ -43,19 +39,11 @@ enum Endianness {
 };
 
 
-#if defined(__cpp_concepts)
-template <typename T>
-concept serializable = std::is_arithmetic_v<T> || std::is_enum_v<T>;
-
-template <typename T>
-concept integral = std::integral<T>;
-#else
 template <typename T>
 using enable_if_serializable = typename std::enable_if<std::integral_constant<bool, std::is_arithmetic<T>::value || std::is_enum<T>::value>::value, int>::type;
 
 template <typename T>
 using enable_if_integral = typename std::enable_if<std::is_integral<T>::value, int>::type;
-#endif
 
 
 
@@ -70,7 +58,7 @@ private:
 
 
     template <
-        typename T, 
+        typename T,
         Endianness endianness = Endianness::BO_BIG_ENDIAN
     >
     class byte_t_base {
@@ -122,29 +110,8 @@ private:
     };
 
 public:
-    #if defined(__cpp_concepts)
     template <
-        serializable T, 
-        Endianness endianness = Endianness::BO_BIG_ENDIAN
-    >
-    class byte_t : public byte_t_base<T, endianness> {};
-
-    template <integral T>
-    static float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
-
-    template <integral T>
-    static double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
-
-    template <integral T>
-    static T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
-
-    template <integral T>
-    static T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
-    
-    #else 
-    
-    template <
-        typename T, 
+        typename T,
         Endianness endianness = Endianness::BO_BIG_ENDIAN,
         enable_if_serializable<T> = 0
     >
@@ -161,7 +128,6 @@ public:
 
     template <typename T, enable_if_integral<T> = 0>
     static T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
-    #endif
 
 
 
