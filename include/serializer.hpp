@@ -65,7 +65,7 @@ private:
         union {T value; uint8_t bytes[sizeof(T)];} byte_split;
 
         static void _serialize(uint8_t* stream, const uint8_t* bytes, uint8_t byte_size, size_t index_start) {
-            if constexpr (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
+            if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ _is_system_little_endian()) == 0) {
                 std::copy(bytes, bytes + byte_size, stream + index_start);
             } else {
                 std::reverse_copy(bytes, bytes + byte_size, stream + index_start);
@@ -73,7 +73,7 @@ private:
         };
 
         static void _deserialize(const uint8_t* stream, uint8_t* bytes, uint8_t byte_size, size_t index_start) {
-            if constexpr (endianness == Endianness::BO_LITTLE_ENDIAN && _is_system_little_endian()) {
+            if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ _is_system_little_endian()) == 0) {
                 std::copy(stream + index_start, stream + index_start + byte_size, bytes);
             } else {
                 std::reverse_copy(stream + index_start, stream + index_start + byte_size, bytes);
