@@ -33,7 +33,7 @@ Email : pritamhalder.portfolio@gmail.com
 
 
 
-enum Endianness {
+enum class Endianness {
     BO_LITTLE_ENDIAN,
     BO_BIG_ENDIAN
 };
@@ -56,12 +56,13 @@ private:
         return x.bytes[0] == 1;
     };
 
-
+public:
     template <
         typename T,
-        Endianness endianness = Endianness::BO_BIG_ENDIAN
+        Endianness endianness = Endianness::BO_BIG_ENDIAN,
+        enable_if_serializable<T> = 0
     >
-    class byte_t_base {
+    class byte_t {
     private:
         const uint8_t byte_size = sizeof(T);
         union {T value; uint8_t bytes[sizeof(T)];} byte_split;
@@ -108,14 +109,6 @@ private:
             return deserialize(stream.data(), index_start);
         }
     };
-
-public:
-    template <
-        typename T,
-        Endianness endianness = Endianness::BO_BIG_ENDIAN,
-        enable_if_serializable<T> = 0
-    >
-    class byte_t : public byte_t_base<T, endianness> {};
 
     template <typename T, enable_if_integral<T> = 0>
     static float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
