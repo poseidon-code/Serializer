@@ -59,11 +59,12 @@ private:
     };
 
 
+public:
     template <
-        typename T,
+        serializable T,
         Endianness endianness = Endianness::BO_BIG_ENDIAN
     >
-    class byte_t_base {
+    class byte_t {
     private:
         const uint8_t byte_size = sizeof(T);
         union {T value; uint8_t bytes[sizeof(T)];} byte_split;
@@ -110,13 +111,6 @@ private:
             return deserialize(stream.data(), index_start);
         }
     };
-
-public:
-    template <
-        serializable T,
-        Endianness endianness = Endianness::BO_BIG_ENDIAN
-    >
-    class byte_t : public byte_t_base<T, endianness> {};
 
     template <integral T>
     static float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
