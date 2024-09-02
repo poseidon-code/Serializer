@@ -34,8 +34,8 @@ Email : pritamhalder.portfolio@gmail.com
 
 
 
-enum Endianness {
-    BO_LITTLE_ENDIAN,
+enum class Endianness {
+    BO_LITTLE_ENDIAN = 0,
     BO_BIG_ENDIAN
 };
 
