@@ -22,6 +22,7 @@ Email : pritamhalder.portfolio@gmail.com
 #pragma once
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <concepts>
 #include <cstdint>
@@ -47,14 +48,6 @@ concept integral = std::integral<T>;
 
 
 class serializer {
-private:
-    static constexpr bool _is_system_little_endian() {
-        union {int16_t value; uint8_t bytes[sizeof(value)];} x{};
-        x.value = 1;
-        return x.bytes[0] == 1;
-    };
-
-
 public:
     template <
         serializable T,
@@ -66,7 +59,7 @@ public:
         union {T value; uint8_t bytes[sizeof(T)];} byte_split;
 
         static void _serialize(uint8_t* stream, const uint8_t* bytes, uint8_t byte_size, size_t index_start) {
-            if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ _is_system_little_endian()) == 0) {
+            if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ (std::endian::native == std::endian::little)) == 0) {
                 std::copy(bytes, bytes + byte_size, stream + index_start);
             } else {
                 std::reverse_copy(bytes, bytes + byte_size, stream + index_start);
@@ -74,7 +67,7 @@ public:
         };
 
         static void _deserialize(const uint8_t* stream, uint8_t* bytes, uint8_t byte_size, size_t index_start) {
-            if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ _is_system_little_endian()) == 0) {
+            if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ (std::endian::native == std::endian::little)) == 0) {
                 std::copy(stream + index_start, stream + index_start + byte_size, bytes);
             } else {
                 std::reverse_copy(stream + index_start, stream + index_start + byte_size, bytes);
