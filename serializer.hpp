@@ -51,16 +51,7 @@ concept integral = std::integral<T>;
 
 
 
-class serializer {
-private:
-    static constexpr bool _is_system_little_endian() {
-        union {int16_t value; uint8_t bytes[sizeof(value)];} x{};
-        x.value = 1;
-        return x.bytes[0] == 1;
-    };
-
-
-public:
+namespace Serializer {
     template <
         serializable T,
         Endianness endianness = Endianness::BO_BIG_ENDIAN
@@ -199,7 +190,7 @@ public:
         print(stream.data(), stream.size(), delimeter);
     }
 
-    static void print(const serializer::stream& stream, std::string delimeter = " ") {
+    static void print(const Serializer::stream& stream, std::string delimeter = " ") {
         print(stream.get().data(), stream.get().size(), delimeter);
     }
 
@@ -216,30 +207,30 @@ public:
         return sprint(stream.data(), stream.size(), delimeter);
     }
 
-    static std::string sprint(const serializer::stream& stream, std::string delimeter = " ") {
+    static std::string sprint(const Serializer::stream& stream, std::string delimeter = " ") {
         return sprint(stream.get().data(), stream.get().size(), delimeter);
     }
 };
 
 
-static serializer::byte_t<uint8_t, Endianness::BO_BIG_ENDIAN>       ubyte_1_be;
-static serializer::byte_t<uint16_t, Endianness::BO_BIG_ENDIAN>      ubyte_2_be;
-static serializer::byte_t<uint32_t, Endianness::BO_BIG_ENDIAN>      ubyte_4_be;
-static serializer::byte_t<uint64_t, Endianness::BO_BIG_ENDIAN>      ubyte_8_be;
-static serializer::byte_t<int8_t, Endianness::BO_BIG_ENDIAN>        byte_1_be;
-static serializer::byte_t<int16_t, Endianness::BO_BIG_ENDIAN>       byte_2_be;
-static serializer::byte_t<int32_t, Endianness::BO_BIG_ENDIAN>       byte_4_be;
-static serializer::byte_t<int64_t, Endianness::BO_BIG_ENDIAN>       byte_8_be;
-static serializer::byte_t<float, Endianness::BO_BIG_ENDIAN>         fpbyte_4_be;
-static serializer::byte_t<double, Endianness::BO_BIG_ENDIAN>        fpbyte_8_be;
+static Serializer::byte_t<uint8_t, Endianness::BO_BIG_ENDIAN>       ubyte_1_be;
+static Serializer::byte_t<uint16_t, Endianness::BO_BIG_ENDIAN>      ubyte_2_be;
+static Serializer::byte_t<uint32_t, Endianness::BO_BIG_ENDIAN>      ubyte_4_be;
+static Serializer::byte_t<uint64_t, Endianness::BO_BIG_ENDIAN>      ubyte_8_be;
+static Serializer::byte_t<int8_t, Endianness::BO_BIG_ENDIAN>        byte_1_be;
+static Serializer::byte_t<int16_t, Endianness::BO_BIG_ENDIAN>       byte_2_be;
+static Serializer::byte_t<int32_t, Endianness::BO_BIG_ENDIAN>       byte_4_be;
+static Serializer::byte_t<int64_t, Endianness::BO_BIG_ENDIAN>       byte_8_be;
+static Serializer::byte_t<float, Endianness::BO_BIG_ENDIAN>         fpbyte_4_be;
+static Serializer::byte_t<double, Endianness::BO_BIG_ENDIAN>        fpbyte_8_be;
 
-static serializer::byte_t<uint8_t, Endianness::BO_LITTLE_ENDIAN>    ubyte_1_le;
-static serializer::byte_t<uint16_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_2_le;
-static serializer::byte_t<uint32_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_4_le;
-static serializer::byte_t<uint64_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_8_le;
-static serializer::byte_t<int8_t, Endianness::BO_LITTLE_ENDIAN>     byte_1_le;
-static serializer::byte_t<int16_t, Endianness::BO_LITTLE_ENDIAN>    byte_2_le;
-static serializer::byte_t<int32_t, Endianness::BO_LITTLE_ENDIAN>    byte_4_le;
-static serializer::byte_t<int64_t, Endianness::BO_LITTLE_ENDIAN>    byte_8_le;
-static serializer::byte_t<float, Endianness::BO_LITTLE_ENDIAN>      fpbyte_4_le;
-static serializer::byte_t<double, Endianness::BO_LITTLE_ENDIAN>     fpbyte_8_le;
+static Serializer::byte_t<uint8_t, Endianness::BO_LITTLE_ENDIAN>    ubyte_1_le;
+static Serializer::byte_t<uint16_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_2_le;
+static Serializer::byte_t<uint32_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_4_le;
+static Serializer::byte_t<uint64_t, Endianness::BO_LITTLE_ENDIAN>   ubyte_8_le;
+static Serializer::byte_t<int8_t, Endianness::BO_LITTLE_ENDIAN>     byte_1_le;
+static Serializer::byte_t<int16_t, Endianness::BO_LITTLE_ENDIAN>    byte_2_le;
+static Serializer::byte_t<int32_t, Endianness::BO_LITTLE_ENDIAN>    byte_4_le;
+static Serializer::byte_t<int64_t, Endianness::BO_LITTLE_ENDIAN>    byte_8_le;
+static Serializer::byte_t<float, Endianness::BO_LITTLE_ENDIAN>      fpbyte_4_le;
+static Serializer::byte_t<double, Endianness::BO_LITTLE_ENDIAN>     fpbyte_8_le;

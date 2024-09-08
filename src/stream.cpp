@@ -27,19 +27,19 @@ Email : pritamhalder.portfolio@gmail.com
 
 
 
-serializer::stream::stream(size_t length)
+Serializer::stream::stream(size_t length)
     : buffer(length, 0x00), index(0)
 {}
 
-serializer::stream::stream(const serializer::stream& other)
+Serializer::stream::stream(const Serializer::stream& other)
     : buffer(other.buffer), index(other.index)
 {}
 
-serializer::stream::stream(serializer::stream&& other) noexcept
+Serializer::stream::stream(Serializer::stream&& other) noexcept
     : buffer(std::move(other.buffer)), index(other.index)
 { other.index = 0; }
 
-serializer::stream& serializer::stream::operator=(const serializer::stream& other) {
+Serializer::stream& Serializer::stream::operator=(const Serializer::stream& other) {
     if (this != &other) {
         this->buffer = other.buffer;
         this->index = other.index;
@@ -47,7 +47,7 @@ serializer::stream& serializer::stream::operator=(const serializer::stream& othe
     return *this;
 }
 
-serializer::stream& serializer::stream::operator=(serializer::stream&& other) noexcept {
+Serializer::stream& Serializer::stream::operator=(Serializer::stream&& other) noexcept {
     if (this != &other) {
         this->buffer = std::move(other.buffer);
         this->index = other.index;
@@ -56,21 +56,21 @@ serializer::stream& serializer::stream::operator=(serializer::stream&& other) no
     return *this;
 }
 
-std::vector<uint8_t> const serializer::stream::get() const {
+std::vector<uint8_t> const Serializer::stream::get() const {
     return this->buffer;
 }
 
-serializer::stream& serializer::stream::operator<<(const std::vector<uint8_t>& buffer) {
+Serializer::stream& Serializer::stream::operator<<(const std::vector<uint8_t>& buffer) {
     std::copy(buffer.begin(), buffer.end(), this->buffer.begin() + this->index);
     this->index += buffer.size();
     return *this;
 }
 
-void serializer::stream::put(const uint8_t* buffer, size_t length, size_t index_start) {
+void Serializer::stream::put(const uint8_t* buffer, size_t length, size_t index_start) {
     std::copy(buffer, buffer + length, this->buffer.begin() + index_start);
     this->index = this->index + (index_start - this->index) + length;
 }
 
-void serializer::stream::put(const std::vector<uint8_t>& buffer, size_t index_start) {
+void Serializer::stream::put(const std::vector<uint8_t>& buffer, size_t index_start) {
     this->put(buffer.data(), buffer.size(), index_start);
 }
