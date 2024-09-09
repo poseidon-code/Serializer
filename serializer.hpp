@@ -49,8 +49,6 @@ concept integral = std::integral<T>;
 
 
 
-
-
 namespace Serializer {
     template <
         serializable T,
@@ -118,27 +116,27 @@ namespace Serializer {
 
 
 
-    class stream {
+    class Stream {
     private:
         std::vector<uint8_t> buffer;
         size_t index;
 
     public:
-        stream() = delete;
+        Stream() = delete;
 
-        stream(size_t length)
+        Stream(size_t length)
             : buffer(length, 0x00), index(0)
         {};
 
-        stream(const stream& other)
+        Stream(const Stream& other)
             : buffer(other.buffer), index(other.index)
         {}
 
-        stream(stream&& other) noexcept
+        Stream(Stream&& other) noexcept
             : buffer(std::move(other.buffer)), index(other.index)
         { other.index = 0; }
 
-        stream& operator=(const stream& other) {
+        Stream& operator=(const Stream& other) {
             if (this != &other) {
                 this->buffer = other.buffer;
                 this->index = other.index;
@@ -146,7 +144,7 @@ namespace Serializer {
             return *this;
         }
 
-        stream& operator=(stream&& other) noexcept {
+        Stream& operator=(Stream&& other) noexcept {
             if (this != &other) {
                 this->buffer = std::move(other.buffer);
                 this->index = other.index;
@@ -155,13 +153,13 @@ namespace Serializer {
             return *this;
         }
 
-        ~stream() = default;
+        ~Stream() = default;
 
         std::vector<uint8_t> const get() const {
             return this->buffer;
         }
 
-        stream& operator<<(const std::vector<uint8_t>& buffer) {
+        Stream& operator<<(const std::vector<uint8_t>& buffer) {
             std::copy(buffer.begin(), buffer.end(), this->buffer.begin() + this->index);
             this->index += buffer.size();
             return *this;
@@ -190,7 +188,7 @@ namespace Serializer {
         print(stream.data(), stream.size(), delimeter);
     }
 
-    static void print(const Serializer::stream& stream, std::string delimeter = " ") {
+    static void print(const Serializer::Stream& stream, std::string delimeter = " ") {
         print(stream.get().data(), stream.get().size(), delimeter);
     }
 
@@ -207,7 +205,7 @@ namespace Serializer {
         return sprint(stream.data(), stream.size(), delimeter);
     }
 
-    static std::string sprint(const Serializer::stream& stream, std::string delimeter = " ") {
+    static std::string sprint(const Serializer::Stream& stream, std::string delimeter = " ") {
         return sprint(stream.get().data(), stream.get().size(), delimeter);
     }
 };

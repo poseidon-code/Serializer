@@ -43,7 +43,7 @@ void Serializer::print(const std::vector<uint8_t>& stream, std::string delimeter
 }
 
 
-void Serializer::print(const Serializer::stream& stream, std::string delimeter) {
+void Serializer::print(const Serializer::Stream& stream, std::string delimeter) {
     Serializer::print(stream.get().data(), stream.get().size(), delimeter);
 }
 
@@ -63,6 +63,6 @@ std::string Serializer::sprint(const std::vector<uint8_t>& stream, std::string d
 }
 
 
-std::string Serializer::sprint(const Serializer::stream& stream, std::string delimeter) {
+std::string Serializer::sprint(const Serializer::Stream& stream, std::string delimeter) {
     return Serializer::sprint(stream.get().data(), stream.get().size(), delimeter);
 }

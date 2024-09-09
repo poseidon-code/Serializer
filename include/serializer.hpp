@@ -114,22 +114,22 @@ namespace Serializer {
 
 
 
-    class stream {
+    class Stream {
     private:
         std::vector<uint8_t> buffer;
         size_t index;
 
     public:
-        stream() = delete;
-        stream(size_t length);
-        stream(const stream& other);
-        stream(stream&& other) noexcept;
-        stream& operator=(const stream& other);
-        stream& operator=(stream&& other) noexcept;
-        ~stream() = default;
+        Stream() = delete;
+        Stream(size_t length);
+        Stream(const Stream& other);
+        Stream(Stream&& other) noexcept;
+        Stream& operator=(const Stream& other);
+        Stream& operator=(Stream&& other) noexcept;
+        ~Stream() = default;
 
         std::vector<uint8_t> const get() const;
-        stream& operator<<(const std::vector<uint8_t>& buffer);
+        Stream& operator<<(const std::vector<uint8_t>& buffer);
         void put(const uint8_t* buffer, size_t length, size_t index_start = 0);
         void put(const std::vector<uint8_t>& buffer, size_t index_start = 0);
     };
@@ -138,10 +138,10 @@ namespace Serializer {
 
     static void print(const uint8_t* stream, size_t length, std::string delimeter = " ");
     static void print(const std::vector<uint8_t>& stream, std::string delimeter = " ");
-    static void print(const Serializer::stream& stream, std::string delimeter = " ");
+    static void print(const Serializer::Stream& stream, std::string delimeter = " ");
     static std::string sprint(const uint8_t* stream, size_t length, std::string delimeter = " ");
     static std::string sprint(const std::vector<uint8_t>& stream, std::string delimeter = " ");
-    static std::string sprint(const Serializer::stream& stream, std::string delimeter = " ");
+    static std::string sprint(const Serializer::Stream& stream, std::string delimeter = " ");
 };
 
 
