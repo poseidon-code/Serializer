@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(serializer)
+project(Serializer)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,8 +9,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 # libserializer
 set(LIBSERIALIZER_SOURCES
-    "src/serializer.cpp"
-    "src/stream.cpp"
+    "include/Serializer.hpp"
+    "src/Serializer.cpp"
+    "src/Stream.cpp"
 )
 set(LIBSERIALIZER_INCLUDE_DIRECTORIES
     "include/"
