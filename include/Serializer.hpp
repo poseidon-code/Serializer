@@ -23,10 +23,8 @@ Email : pritamhalder.portfolio@gmail.com
 
 #include <algorithm>
 #include <bit>
-#include <cmath>
 #include <concepts>
 #include <cstdint>
-#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -41,108 +39,60 @@ enum class Endianness {
 template <typename T>
 concept serializable = std::is_arithmetic_v<T> || std::is_enum_v<T>;
 
-template <typename T>
-concept integral = std::integral<T>;
-
-
-
 
 namespace Serializer {
-    template <
-        serializable T,
-        Endianness endianness = Endianness::BO_BIG_ENDIAN
-    >
-    class byte_t {
-    private:
-        const uint8_t byte_size = sizeof(T);
-        union {T value; uint8_t bytes[sizeof(T)];} byte_split;
+template <
+    serializable T,
+    Endianness endianness = Endianness::BO_BIG_ENDIAN
+>
+class byte_t {
+private:
+    const uint8_t byte_size = sizeof(T);
+    union {T value; uint8_t bytes[sizeof(T)];} byte_split;
 
-        static void _serialize(uint8_t* stream, const uint8_t* bytes, uint8_t byte_size, size_t index_start) {
-            if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ (std::endian::native == std::endian::little)) == 0) {
-                std::copy(bytes, bytes + byte_size, stream + index_start);
-            } else {
-                std::reverse_copy(bytes, bytes + byte_size, stream + index_start);
-            }
-        };
-
-        static void _deserialize(const uint8_t* stream, uint8_t* bytes, uint8_t byte_size, size_t index_start) {
-            if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ (std::endian::native == std::endian::little)) == 0) {
-                std::copy(stream + index_start, stream + index_start + byte_size, bytes);
-            } else {
-                std::reverse_copy(stream + index_start, stream + index_start + byte_size, bytes);
-            }
-        };
-
-    public:
-        void serialize(uint8_t* stream, T value, size_t index_start = 0) {
-            this->byte_split.value = value;
-            _serialize(stream, this->byte_split.bytes, this->byte_size, index_start);
-        }
-
-        void serialize(std::vector<uint8_t>& stream, T value, size_t index_start = 0) {
-            serialize(stream.data(), value, index_start);
-        }
-
-        std::vector<uint8_t> serialize(T value) {
-            std::vector<uint8_t> buffer(this->byte_size, 0x00);
-            serialize(buffer.data(), value, 0);
-            return buffer;
-        }
-
-        T deserialize(const uint8_t* stream, size_t index_start = 0) {
-            this->byte_split.value = 0;
-            _deserialize(stream, this->byte_split.bytes, this->byte_size, index_start);
-            return this->byte_split.value;
-        }
-
-        T deserialize(const std::vector<uint8_t>& stream, size_t index_start = 0) {
-            return deserialize(stream.data(), index_start);
+    static void _serialize(uint8_t* stream, const uint8_t* bytes, uint8_t byte_size, size_t index_start) {
+        if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ (std::endian::native == std::endian::little)) == 0) {
+            std::copy(bytes, bytes + byte_size, stream + index_start);
+        } else {
+            std::reverse_copy(bytes, bytes + byte_size, stream + index_start);
         }
     };
 
-    template <integral T>
-    static float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
-
-    template <integral T>
-    static double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
-
-    template <integral T>
-    static T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
-
-    template <integral T>
-    static T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
-
-
-
-    class Stream {
-    private:
-        std::vector<uint8_t> buffer;
-        size_t index;
-
-    public:
-        Stream() = delete;
-        Stream(size_t length);
-        Stream(const Stream& other);
-        Stream(Stream&& other) noexcept;
-        Stream& operator=(const Stream& other);
-        Stream& operator=(Stream&& other) noexcept;
-        ~Stream() = default;
-
-        std::vector<uint8_t> const get() const;
-        Stream& operator<<(const std::vector<uint8_t>& buffer);
-        void put(const uint8_t* buffer, size_t length, size_t index_start = 0);
-        void put(const std::vector<uint8_t>& buffer, size_t index_start = 0);
+    static void _deserialize(const uint8_t* stream, uint8_t* bytes, uint8_t byte_size, size_t index_start) {
+        if constexpr (((endianness == Endianness::BO_LITTLE_ENDIAN) ^ (std::endian::native == std::endian::little)) == 0) {
+            std::copy(stream + index_start, stream + index_start + byte_size, bytes);
+        } else {
+            std::reverse_copy(stream + index_start, stream + index_start + byte_size, bytes);
+        }
     };
 
+public:
+    void serialize(uint8_t* stream, T value, size_t index_start = 0) {
+        this->byte_split.value = value;
+        _serialize(stream, this->byte_split.bytes, this->byte_size, index_start);
+    }
 
+    void serialize(std::vector<uint8_t>& stream, T value, size_t index_start = 0) {
+        serialize(stream.data(), value, index_start);
+    }
 
-    static void print(const uint8_t* stream, size_t length, std::string delimeter = " ");
-    static void print(const std::vector<uint8_t>& stream, std::string delimeter = " ");
-    static void print(const Serializer::Stream& stream, std::string delimeter = " ");
-    static std::string sprint(const uint8_t* stream, size_t length, std::string delimeter = " ");
-    static std::string sprint(const std::vector<uint8_t>& stream, std::string delimeter = " ");
-    static std::string sprint(const Serializer::Stream& stream, std::string delimeter = " ");
+    std::vector<uint8_t> serialize(T value) {
+        std::vector<uint8_t> buffer(this->byte_size, 0x00);
+        serialize(buffer.data(), value, 0);
+        return buffer;
+    }
+
+    T deserialize(const uint8_t* stream, size_t index_start = 0) {
+        this->byte_split.value = 0;
+        _deserialize(stream, this->byte_split.bytes, this->byte_size, index_start);
+        return this->byte_split.value;
+    }
+
+    T deserialize(const std::vector<uint8_t>& stream, size_t index_start = 0) {
+        return deserialize(stream.data(), index_start);
+    }
 };
+}
 
 
 static Serializer::byte_t<uint8_t, Endianness::BO_BIG_ENDIAN>       ubyte_1_be;
