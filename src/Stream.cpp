@@ -21,9 +21,13 @@ Email : pritamhalder.portfolio@gmail.com
 
 #include <algorithm>
 #include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 
-#include "Serializer.hpp"
+#include "Stream.hpp"
 
 
 
@@ -73,4 +77,26 @@ void Serializer::Stream::put(const uint8_t* buffer, size_t length, size_t index_
 
 void Serializer::Stream::put(const std::vector<uint8_t>& buffer, size_t index_start) {
     this->put(buffer.data(), buffer.size(), index_start);
+}
+
+void Serializer::print(const Serializer::Stream& stream, std::string delimeter) {
+    const uint8_t* t_stream = stream.get().data();
+    const size_t length = stream.get().size();
+
+    std::cout << std::hex << std::uppercase << std::setfill('0');
+    for (size_t i = 0; i < length; ++i)
+        std::cout << std::setw(2)  << static_cast<uint>(t_stream[i]) << (i == length - 1 ? "" : delimeter);
+    std::cout << std::dec << std::nouppercase << std::setfill(' ');
+}
+
+std::string Serializer::sprint(const Serializer::Stream& stream, std::string delimeter) {
+    const uint8_t* t_stream = stream.get().data();
+    const size_t length = stream.get().size();
+
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setfill('0');
+    for (size_t i = 0; i < length; ++i)
+        oss << std::setw(2) << static_cast<uint>(t_stream[i]) << (i == length - 1 ? "" : delimeter);
+    std::cout << std::dec << std::nouppercase << std::setfill(' ');
+    return oss.str();
 }
