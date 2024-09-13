@@ -9,18 +9,18 @@ A binary data serializer in modern C++. Encodes & Decodes data to/from bytes wit
 ```cpp
 #include <iostream>
 
-#include "serializer.hpp"
+#include "Serializer.hpp"
 
 int main() {
     const size_t stream_length = 16;
     unsigned char stream[stream_length] = {0}; // create the bytes array
-    serializer::byte_t<int64_t> byte_8; // create a default serializer object (Big Endian) of 8 bytes
+    Serializer::byte_t<int64_t> byte_8; // create a default Serializer object (Big Endian) of 8 bytes
 
     byte_8.serialize(stream, 0x1122334455667788); // serialize the data and start putting it from 0 index of bytes array
 
     byte_8.serialize(stream, 0x8877665544332211, 8); // serialize the data and start putting it from 8th index of bytes array
 
-    serializer::print(stream, stream_length); // prints the entire bytes array (default delimeter "<space>")
+    Serializer::print(stream, stream_length); // prints the entire bytes array (default delimeter "<space>")
     std::cout << "\n";
 
     int64_t deserialized_value1 = byte_8.deserialize(stream); // returns the data after deserializing from 0 index of bytes array
@@ -40,7 +40,7 @@ int main() {
 #include <iostream>
 #include <vector>
 
-#include "serializer.hpp"
+#include "Serializer.hpp"
 
 int main() {
     const size_t stream_length = 16;
@@ -52,7 +52,7 @@ int main() {
     for (auto byte : serialized_value2) std::cout << std::hex << static_cast<uint>(byte) << " "; std::cout << std::dec << "\n"; // prints the returned bytes vector
     std::copy(serialized_value2.begin(), serialized_value2.end(), stream.begin() + 8); // putting the returned bytes vector to the `stream` bytes vector from its 8th index
 
-    std::string stream_str = serializer::sprint(stream, ", "); // returns the bytes as a string with <comma> delimeter
+    std::string stream_str = Serializer::sprint(stream, ", "); // returns the bytes as a string with <comma> delimeter
     std::cout << stream_str << "\n"; // prints the returned string
 
     int64_t deserialized_value1 = byte_8_le.deserialize(stream); // returns the data after deserializing from 0 index of bytes array
@@ -70,18 +70,18 @@ int main() {
 ```cpp
 #include <iostream>
 
-#include "serializer.hpp"
+#include "Serializer.hpp"
 
 int main() {
     const size_t stream_length = 16;
-    serializer::stream stream(stream_length); // create a stream object with length
-    serializer::byte_t<int64_t, Endianness::BO_BIG_ENDIAN> byte_8; // create a serializer object (Big Endian) of 8 bytes
+    Serializer::Stream stream(stream_length); // create a stream object with length
+    Serializer::byte_t<int64_t, Endianness::BO_BIG_ENDIAN> byte_8; // create a Serializer object (Big Endian) of 8 bytes
 
     stream << byte_8.serialize(0x1122334455667788); // serialize the data and put it into the stream after previous
 
     stream.put(byte_8.serialize(0x1122334455667788), 8); // serialize the data and start putting it from 8th index of the stream
 
-    serializer::print(stream); // prints the entire stream
+    Serializer::print(stream); // prints the entire stream
     std::cout << "\n";
 
     int64_t deserialized_value1 = byte_8.deserialize(stream.get()); // returns the data after deserializing from 0 index of stream vector
