@@ -60,7 +60,7 @@ Serializer::Stream& Serializer::Stream::operator=(Serializer::Stream&& other) no
     return *this;
 }
 
-std::vector<uint8_t> const Serializer::Stream::get() const {
+const std::vector<uint8_t>& Serializer::Stream::get() const {
     return this->buffer;
 }
 
@@ -79,7 +79,7 @@ void Serializer::Stream::put(const std::vector<uint8_t>& buffer, size_t index_st
     this->put(buffer.data(), buffer.size(), index_start);
 }
 
-void Serializer::print(const Serializer::Stream& stream, std::string delimeter) {
+void Serializer::print(const Serializer::Stream& stream, const std::string& delimeter) {
     const uint8_t* t_stream = stream.get().data();
     const size_t length = stream.get().size();
 
@@ -89,7 +89,7 @@ void Serializer::print(const Serializer::Stream& stream, std::string delimeter) 
     std::cout << std::dec << std::nouppercase << std::setfill(' ');
 }
 
-std::string Serializer::sprint(const Serializer::Stream& stream, std::string delimeter) {
+std::string Serializer::sprint(const Serializer::Stream& stream, const std::string& delimeter) {
     const uint8_t* t_stream = stream.get().data();
     const size_t length = stream.get().size();
 

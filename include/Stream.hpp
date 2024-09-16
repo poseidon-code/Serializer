@@ -41,12 +41,12 @@ public:
     Stream& operator=(Stream&& other) noexcept;
     ~Stream() = default;
 
-    std::vector<uint8_t> const get() const;
+    const std::vector<uint8_t>& get() const;
     Stream& operator<<(const std::vector<uint8_t>& buffer);
     void put(const uint8_t* buffer, size_t length, size_t index_start = 0);
     void put(const std::vector<uint8_t>& buffer, size_t index_start = 0);
 };
 
-static void print(const Serializer::Stream& stream, std::string delimeter = " ");
-static std::string sprint(const Serializer::Stream& stream, std::string delimeter = " ");
+static void print(const Serializer::Stream& stream, const std::string& delimeter = " ");
+static std::string sprint(const Serializer::Stream& stream, const std::string& delimeter = " ");
 }
