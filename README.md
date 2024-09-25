@@ -2,7 +2,7 @@
 
 A binary data serializer in modern C++. Encodes & Decodes data to/from bytes with Little & Big Endian byte orders.
 
-## Usage Examples
+## Usage
 
 ### 1. Plain Old Arrays
 
@@ -65,7 +65,7 @@ int main() {
 }
 ```
 
-### 3. `stream`
+### 3. `Stream`
 
 ```cpp
 #include <iostream>
@@ -75,7 +75,7 @@ int main() {
 int main() {
     const size_t stream_length = 16;
     Serializer::Stream stream(stream_length); // create a stream object with length
-    Serializer::byte_t<int64_t, Endianness::BO_BIG_ENDIAN> byte_8; // create a Serializer object (Big Endian) of 8 bytes
+    Serializer::byte_t<int64_t, std::endian::big> byte_8; // create a Serializer object (Big Endian) of 8 bytes
 
     stream << byte_8.serialize(0x1122334455667788); // serialize the data and put it into the stream after previous
 
