@@ -1,5 +1,5 @@
 /*
-serializer : A modern C++ binary data serializer library.
+Serializer : A modern C++ binary data serializer library.
 Copyright (C) 2024  Pritam Halder
 
 This program is free software: you can redistribute it and/or modify
@@ -19,18 +19,16 @@ Author : Pritam Halder
 Email : pritamhalder.portfolio@gmail.com
 */
 
-#include <algorithm>
-#include <cstdint>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include "serializer.hpp"
+#include "Utility.hpp"
 
 
-void serializer::print(const uint8_t* stream, size_t length, std::string delimeter) {
+void Serializer::print(const uint8_t* stream, size_t length, const std::string& delimeter) {
     std::cout << std::hex << std::uppercase << std::setfill('0');
     for (size_t i = 0; i < length; ++i)
         std::cout << std::setw(2)  << static_cast<uint>(stream[i]) << (i == length - 1 ? "" : delimeter);
@@ -38,17 +36,12 @@ void serializer::print(const uint8_t* stream, size_t length, std::string delimet
 }
 
 
-void serializer::print(const std::vector<uint8_t>& stream, std::string delimeter) {
-    serializer::print(stream.data(), stream.size(), delimeter);
+void Serializer::print(const std::vector<uint8_t>& stream, const std::string& delimeter) {
+    Serializer::print(stream.data(), stream.size(), delimeter);
 }
 
 
-void serializer::print(const serializer::stream& stream, std::string delimeter) {
-    serializer::print(stream.get().data(), stream.get().size(), delimeter);
-}
-
-
-std::string serializer::sprint(const uint8_t* stream, size_t length, std::string delimeter) {
+std::string Serializer::sprint(const uint8_t* stream, size_t length, const std::string& delimeter) {
     std::ostringstream oss;
     oss << std::hex << std::uppercase << std::setfill('0');
     for (size_t i = 0; i < length; ++i)
@@ -58,11 +51,6 @@ std::string serializer::sprint(const uint8_t* stream, size_t length, std::string
 }
 
 
-std::string serializer::sprint(const std::vector<uint8_t>& stream, std::string delimeter) {
-    return serializer::sprint(stream.data(), stream.size(), delimeter);
-}
-
-
-std::string serializer::sprint(const serializer::stream& stream, std::string delimeter) {
-    return serializer::sprint(stream.get().data(), stream.get().size(), delimeter);
+std::string Serializer::sprint(const std::vector<uint8_t>& stream, const std::string& delimeter) {
+    return Serializer::sprint(stream.data(), stream.size(), delimeter);
 }
