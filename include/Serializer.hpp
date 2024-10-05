@@ -25,6 +25,7 @@ Email : pritamhalder.portfolio@gmail.com
 #include <bit>
 #include <concepts>
 #include <cstdint>
+#include <stdfloat>
 #include <type_traits>
 #include <vector>
 
@@ -89,24 +90,28 @@ public:
 }
 
 
-static Serializer::byte_t<uint8_t, std::endian::big>       ubyte_1_be;
-static Serializer::byte_t<uint16_t, std::endian::big>      ubyte_2_be;
-static Serializer::byte_t<uint32_t, std::endian::big>      ubyte_4_be;
-static Serializer::byte_t<uint64_t, std::endian::big>      ubyte_8_be;
-static Serializer::byte_t<int8_t, std::endian::big>        byte_1_be;
-static Serializer::byte_t<int16_t, std::endian::big>       byte_2_be;
-static Serializer::byte_t<int32_t, std::endian::big>       byte_4_be;
-static Serializer::byte_t<int64_t, std::endian::big>       byte_8_be;
-static Serializer::byte_t<float, std::endian::big>         fpbyte_4_be;
-static Serializer::byte_t<double, std::endian::big>        fpbyte_8_be;
+static Serializer::byte_t<uint8_t, std::endian::big>                ubyte_1_be;
+static Serializer::byte_t<uint16_t, std::endian::big>               ubyte_2_be;
+static Serializer::byte_t<uint32_t, std::endian::big>               ubyte_4_be;
+static Serializer::byte_t<uint64_t, std::endian::big>               ubyte_8_be;
+static Serializer::byte_t<int8_t, std::endian::big>                 byte_1_be;
+static Serializer::byte_t<int16_t, std::endian::big>                byte_2_be;
+static Serializer::byte_t<int32_t, std::endian::big>                byte_4_be;
+static Serializer::byte_t<int64_t, std::endian::big>                byte_8_be;
+static Serializer::byte_t<std::float16_t, std::endian::big>         fpbyte_2_be;
+static Serializer::byte_t<std::float32_t, std::endian::big>         fpbyte_4_be;
+static Serializer::byte_t<std::float64_t, std::endian::big>         fpbyte_8_be;
+static Serializer::byte_t<std::float128_t, std::endian::big>        fpbyte_16_be;
 
-static Serializer::byte_t<uint8_t, std::endian::little>    ubyte_1_le;
-static Serializer::byte_t<uint16_t, std::endian::little>   ubyte_2_le;
-static Serializer::byte_t<uint32_t, std::endian::little>   ubyte_4_le;
-static Serializer::byte_t<uint64_t, std::endian::little>   ubyte_8_le;
-static Serializer::byte_t<int8_t, std::endian::little>     byte_1_le;
-static Serializer::byte_t<int16_t, std::endian::little>    byte_2_le;
-static Serializer::byte_t<int32_t, std::endian::little>    byte_4_le;
-static Serializer::byte_t<int64_t, std::endian::little>    byte_8_le;
-static Serializer::byte_t<float, std::endian::little>      fpbyte_4_le;
-static Serializer::byte_t<double, std::endian::little>     fpbyte_8_le;
+static Serializer::byte_t<uint8_t, std::endian::little>             ubyte_1_le;
+static Serializer::byte_t<uint16_t, std::endian::little>            ubyte_2_le;
+static Serializer::byte_t<uint32_t, std::endian::little>            ubyte_4_le;
+static Serializer::byte_t<uint64_t, std::endian::little>            ubyte_8_le;
+static Serializer::byte_t<int8_t, std::endian::little>              byte_1_le;
+static Serializer::byte_t<int16_t, std::endian::little>             byte_2_le;
+static Serializer::byte_t<int32_t, std::endian::little>             byte_4_le;
+static Serializer::byte_t<int64_t, std::endian::little>             byte_8_le;
+static Serializer::byte_t<std::float16_t, std::endian::little>      fpbyte_2_le;
+static Serializer::byte_t<std::float32_t, std::endian::little>      fpbyte_4_le;
+static Serializer::byte_t<std::float64_t, std::endian::little>      fpbyte_8_le;
+static Serializer::byte_t<std::float128_t, std::endian::little>     fpbyte_16_le;

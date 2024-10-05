@@ -29,24 +29,7 @@ Email : pritamhalder.portfolio@gmail.com
 #include <vector>
 
 
-template <typename T>
-concept integral = std::integral<T>;
-
-
 namespace Serializer {
-template <integral T>
-static float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
-
-template <integral T>
-static double itod(T value, uint16_t precision) {return static_cast<double>(value) / std::pow(10, precision);}
-
-template <integral T>
-static T ftoi(float value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
-
-template <integral T>
-static T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
-
-
 static void print(const uint8_t* stream, size_t length, const std::string& delimeter = " ");
 static void print(const std::vector<uint8_t>& stream, const std::string& delimeter = " ");
 static std::string sprint(const uint8_t* stream, size_t length, const std::string& delimeter = " ");
