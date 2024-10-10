@@ -19,29 +19,30 @@ Author : Pritam Halder
 Email : pritamhalder.portfolio@gmail.com
 */
 
+#pragma once
+
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include "Utility.hpp"
 
+namespace Serializer {
 
-void Serializer::print(const uint8_t* stream, size_t length, const std::string& delimeter) {
+static void print(const uint8_t* stream, size_t length, const std::string& delimeter = " ") {
     std::cout << std::hex << std::uppercase << std::setfill('0');
     for (size_t i = 0; i < length; ++i)
         std::cout << std::setw(2)  << static_cast<uint>(stream[i]) << (i == length - 1 ? "" : delimeter);
     std::cout << std::dec << std::nouppercase << std::setfill(' ');
 }
 
-
-void Serializer::print(const std::vector<uint8_t>& stream, const std::string& delimeter) {
-    Serializer::print(stream.data(), stream.size(), delimeter);
+static void print(const std::vector<uint8_t>& stream, const std::string& delimeter = " ") {
+    print(stream.data(), stream.size(), delimeter);
 }
 
-
-std::string Serializer::sprint(const uint8_t* stream, size_t length, const std::string& delimeter) {
+static std::string sprint(const uint8_t* stream, size_t length, const std::string& delimeter = " ") {
     std::ostringstream oss;
     oss << std::hex << std::uppercase << std::setfill('0');
     for (size_t i = 0; i < length; ++i)
@@ -50,7 +51,8 @@ std::string Serializer::sprint(const uint8_t* stream, size_t length, const std::
     return oss.str();
 }
 
+static std::string sprint(const std::vector<uint8_t>& stream, const std::string& delimeter = " ") {
+    return sprint(stream.data(), stream.size(), delimeter);
+}
 
-std::string Serializer::sprint(const std::vector<uint8_t>& stream, const std::string& delimeter) {
-    return Serializer::sprint(stream.data(), stream.size(), delimeter);
 }

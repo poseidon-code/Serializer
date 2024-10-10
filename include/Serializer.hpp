@@ -23,9 +23,14 @@ Email : pritamhalder.portfolio@gmail.com
 
 #include <algorithm>
 #include <bit>
+#include <cmath>
 #include <concepts>
 #include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <stdfloat>
+#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -33,6 +38,10 @@ Email : pritamhalder.portfolio@gmail.com
 
 template <typename T>
 concept serializable = std::is_arithmetic_v<T> || std::is_enum_v<T>;
+
+template <typename T>
+concept integral = std::integral<T>;
+
 
 
 namespace Serializer {
@@ -87,7 +96,102 @@ public:
         return deserialize(stream.data(), index_start);
     }
 };
+
+
+
+class Stream {
+private:
+    std::vector<uint8_t> buffer;
+    size_t index;
+
+public:
+    Stream() = delete;
+
+    Stream(size_t length)
+        : buffer(length, 0x00), index(0)
+    {};
+
+    Stream(const Stream& other)
+        : buffer(other.buffer), index(other.index)
+    {}
+
+    Stream(Stream&& other) noexcept
+        : buffer(std::move(other.buffer)), index(other.index)
+    { other.index = 0; }
+
+    Stream& operator=(const Stream& other) {
+        if (this != &other) {
+            this->buffer = other.buffer;
+            this->index = other.index;
+        }
+        return *this;
+    }
+
+    Stream& operator=(Stream&& other) noexcept {
+        if (this != &other) {
+            this->buffer = std::move(other.buffer);
+            this->index = other.index;
+            other.index = 0;
+        }
+        return *this;
+    }
+
+    ~Stream() = default;
+
+    const std::vector<uint8_t>& get() const {
+        return this->buffer;
+    }
+
+    Stream& operator<<(const std::vector<uint8_t>& buffer) {
+        std::copy(buffer.begin(), buffer.end(), this->buffer.begin() + this->index);
+        this->index += buffer.size();
+        return *this;
+    }
+
+    void put(const uint8_t* buffer, size_t length, size_t index_start = 0) {
+        std::copy(buffer, buffer + length, this->buffer.begin() + index_start);
+        this->index = this->index + (index_start - this->index) + length;
+    }
+
+    void put(const std::vector<uint8_t>& buffer, size_t index_start = 0) {
+        this->put(buffer.data(), buffer.size(), index_start);
+    }
+};
+
+
+
+static void print(const uint8_t* stream, size_t length, const std::string& delimeter = " ") {
+    std::cout << std::hex << std::uppercase << std::setfill('0');
+    for (size_t i = 0; i < length; ++i)
+        std::cout << std::setw(2)  << static_cast<uint>(stream[i]) << (i == length - 1 ? "" : delimeter);
+    std::cout << std::dec << std::nouppercase << std::setfill(' ');
 }
+
+static void print(const std::vector<uint8_t>& stream, const std::string& delimeter = " ") {
+    print(stream.data(), stream.size(), delimeter);
+}
+
+static void print(const Serializer::Stream& stream, const std::string& delimeter = " ") {
+    print(stream.get().data(), stream.get().size(), delimeter);
+}
+
+static std::string sprint(const uint8_t* stream, size_t length, const std::string& delimeter = " ") {
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setfill('0');
+    for (size_t i = 0; i < length; ++i)
+        oss << std::setw(2) << static_cast<uint>(stream[i]) << (i == length - 1 ? "" : delimeter);
+    std::cout << std::dec << std::nouppercase << std::setfill(' ');
+    return oss.str();
+}
+
+static std::string sprint(const std::vector<uint8_t>& stream, const std::string& delimeter = " ") {
+    return sprint(stream.data(), stream.size(), delimeter);
+}
+
+static std::string sprint(const Serializer::Stream& stream, const std::string& delimeter = " ") {
+    return sprint(stream.get().data(), stream.get().size(), delimeter);
+}
+};
 
 
 static Serializer::byte_t<uint8_t, std::endian::big>                ubyte_1_be;
