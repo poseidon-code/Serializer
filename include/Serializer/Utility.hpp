@@ -24,6 +24,9 @@ Email : pritamhalder.portfolio@gmail.com
 #include <cmath>
 #include <concepts>
 #include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -34,6 +37,7 @@ using enable_if_integral = typename std::enable_if<std::is_integral<T>::value, i
 
 
 namespace Serializer {
+
 template <typename T, enable_if_integral<T> = 0>
 static float itof(T value, uint16_t precision) {return static_cast<float>(value) / std::pow(10, precision);}
 
@@ -46,9 +50,28 @@ static T ftoi(float value, uint16_t precision) {return static_cast<T>(value * st
 template <typename T, enable_if_integral<T> = 0>
 static T dtoi(double value, uint16_t precision) {return static_cast<T>(value * std::pow(10, precision));}
 
+static void print(const uint8_t* stream, size_t length, const std::string& delimeter = " ") {
+    std::cout << std::hex << std::uppercase << std::setfill('0');
+    for (size_t i = 0; i < length; ++i)
+        std::cout << std::setw(2)  << static_cast<uint>(stream[i]) << (i == length - 1 ? "" : delimeter);
+    std::cout << std::dec << std::nouppercase << std::setfill(' ');
+}
 
-static void print(const uint8_t* stream, size_t length, const std::string& delimeter = " ");
-static void print(const std::vector<uint8_t>& stream, const std::string& delimeter = " ");
-static std::string sprint(const uint8_t* stream, size_t length, const std::string& delimeter = " ");
-static std::string sprint(const std::vector<uint8_t>& stream, const std::string& delimeter = " ");
+static void print(const std::vector<uint8_t>& stream, const std::string& delimeter = " ") {
+    print(stream.data(), stream.size(), delimeter);
+}
+
+static std::string sprint(const uint8_t* stream, size_t length, const std::string& delimeter = " ") {
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setfill('0');
+    for (size_t i = 0; i < length; ++i)
+        oss << std::setw(2) << static_cast<uint>(stream[i]) << (i == length - 1 ? "" : delimeter);
+    std::cout << std::dec << std::nouppercase << std::setfill(' ');
+    return oss.str();
+}
+
+static std::string sprint(const std::vector<uint8_t>& stream, const std::string& delimeter = " ") {
+    return sprint(stream.data(), stream.size(), delimeter);
+}
+
 }
