@@ -1,41 +1,20 @@
 cmake_minimum_required(VERSION 3.25)
-project(Serializer)
+project(Serializer LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
-# libserializer
-set(LIBSERIALIZER_SOURCES
-    "include/Serializer.hpp"
-    "src/Serializer.cpp"
-    "include/Stream.hpp"
-    "src/Stream.cpp"
-    "include/Utility.hpp"
-    "src/Utility.cpp"
+add_library(${PROJECT_NAME} INTERFACE)
+
+target_include_directories(${PROJECT_NAME} INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
-set(LIBSERIALIZER_INCLUDE_DIRECTORIES
-    "include/"
-)
-
-
-# libserializer.a
-add_library("${PROJECT_NAME}_static" STATIC ${LIBSERIALIZER_SOURCES})
-target_include_directories("${PROJECT_NAME}_static" PUBLIC ${LIBSERIALIZER_INCLUDE_DIRECTORIES})
-set_target_properties("${PROJECT_NAME}_static"
-    PROPERTIES
-    OUTPUT_NAME ${PROJECT_NAME}
-    POSITION_INDEPENDENT_CODE ON
-)
-
-
-# libserializer.so
-add_library("${PROJECT_NAME}_shared" SHARED ${LIBSERIALIZER_SOURCES})
-target_include_directories("${PROJECT_NAME}_shared" PUBLIC ${LIBSERIALIZER_INCLUDE_DIRECTORIES})
-set_target_properties("${PROJECT_NAME}_shared"
-    PROPERTIES
-    OUTPUT_NAME ${PROJECT_NAME}
-    POSITION_INDEPENDENT_CODE ON
+install(TARGETS ${PROJECT_NAME} EXPORT "${PROJECT_NAME}Export")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include" DESTINATION "include")
+install(EXPORT "${PROJECT_NAME}Export"
+    FILE "${PROJECT_NAME}Config.cmake"
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION "lib/cmake/${PROJECT_NAME}"
 )
