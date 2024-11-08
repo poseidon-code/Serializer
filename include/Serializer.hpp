@@ -99,67 +99,6 @@ public:
 
 
 
-class Stream {
-private:
-    std::vector<uint8_t> buffer;
-    size_t index;
-
-public:
-    Stream() = delete;
-
-    Stream(size_t length)
-        : buffer(length, 0x00), index(0)
-    {};
-
-    Stream(const Stream& other)
-        : buffer(other.buffer), index(other.index)
-    {}
-
-    Stream(Stream&& other) noexcept
-        : buffer(std::move(other.buffer)), index(other.index)
-    { other.index = 0; }
-
-    Stream& operator=(const Stream& other) {
-        if (this != &other) {
-            this->buffer = other.buffer;
-            this->index = other.index;
-        }
-        return *this;
-    }
-
-    Stream& operator=(Stream&& other) noexcept {
-        if (this != &other) {
-            this->buffer = std::move(other.buffer);
-            this->index = other.index;
-            other.index = 0;
-        }
-        return *this;
-    }
-
-    ~Stream() = default;
-
-    const std::vector<uint8_t>& get() const {
-        return this->buffer;
-    }
-
-    Stream& operator<<(const std::vector<uint8_t>& buffer) {
-        std::copy(buffer.begin(), buffer.end(), this->buffer.begin() + this->index);
-        this->index += buffer.size();
-        return *this;
-    }
-
-    void put(const uint8_t* buffer, size_t length, size_t index_start = 0) {
-        std::copy(buffer, buffer + length, this->buffer.begin() + index_start);
-        this->index = this->index + (index_start - this->index) + length;
-    }
-
-    void put(const std::vector<uint8_t>& buffer, size_t index_start = 0) {
-        this->put(buffer.data(), buffer.size(), index_start);
-    }
-};
-
-
-
 static void print(const uint8_t* stream, size_t length, const std::string& delimeter = " ") {
     std::cout << std::hex << std::uppercase << std::setfill('0');
     for (size_t i = 0; i < length; ++i)
@@ -171,9 +110,7 @@ static void print(const std::vector<uint8_t>& stream, const std::string& delimet
     print(stream.data(), stream.size(), delimeter);
 }
 
-static void print(const Serializer::Stream& stream, const std::string& delimeter = " ") {
-    print(stream.get().data(), stream.get().size(), delimeter);
-}
+
 
 static std::string sprint(const uint8_t* stream, size_t length, const std::string& delimeter = " ") {
     std::ostringstream oss;
@@ -187,11 +124,7 @@ static std::string sprint(const uint8_t* stream, size_t length, const std::strin
 static std::string sprint(const std::vector<uint8_t>& stream, const std::string& delimeter = " ") {
     return sprint(stream.data(), stream.size(), delimeter);
 }
-
-static std::string sprint(const Serializer::Stream& stream, const std::string& delimeter = " ") {
-    return sprint(stream.get().data(), stream.get().size(), delimeter);
 }
-};
 
 
 static Serializer::byte_t<uint8_t, std::endian::big>                ubyte_1_be;
