@@ -36,6 +36,7 @@ concept serializable = std::is_arithmetic_v<T> || std::is_enum_v<T>;
 
 
 namespace Serializer {
+
 template <
     serializable T,
     std::endian endianness = std::endian::little
@@ -87,6 +88,7 @@ public:
         return deserialize(stream.data(), index_start);
     }
 };
+
 }
 
 
