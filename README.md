@@ -65,34 +65,6 @@ int main() {
 }
 ```
 
-### 3. `Stream`
-
-```cpp
-#include <iostream>
-
-#include "Serializer.hpp"
-
-int main() {
-    const size_t stream_length = 16;
-    Serializer::Stream stream(stream_length); // create a stream object with length
-    Serializer::byte_t<int64_t, std::endian::big> byte_8; // create a Serializer object (Big Endian) of 8 bytes
-
-    stream << byte_8.serialize(0x1122334455667788); // serialize the data and put it into the stream after previous
-
-    stream.put(byte_8.serialize(0x1122334455667788), 8); // serialize the data and start putting it from 8th index of the stream
-
-    Serializer::print(stream); // prints the entire stream
-    std::cout << "\n";
-
-    int64_t deserialized_value1 = byte_8.deserialize(stream.get()); // returns the data after deserializing from 0 index of stream vector
-    int64_t deserialized_value2 = byte_8.deserialize(stream.get().data(), 8); // returns the data after deserializing from 8th index of internal stream array
-
-    std::cout << std::hex << "0x" << deserialized_value1 << " - 0x" << deserialized_value2 << std::dec << "\n";
-
-
-    return 0;
-}
-```
 
 ## [GPL v3 License](./LICENSE)
 
