@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 Author : Pritam Halder
-Email : pritamhalder.portfolio@gmail.com
+Email : pritamhalder.poseidon@proton.me
 */
 
 #pragma once
