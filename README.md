@@ -66,6 +66,30 @@ int main() {
 ```
 
 
+### 3. Fixed Point Quantization
+
+```cpp
+#include <stdfloat>
+#include <cstdint>
+
+#include "Serializer.hpp"
+
+
+int main() {
+    std::float64_t value = 67.9834672;
+    Serializer::fixed_point_quantizer<std::float64_t> quantizer(-90.0, 90.0); // precision will be lost if there are low number of bits
+
+    auto quantized_value = quantizer.to_fpq(value); // quantized value to 64bit signed integer
+    std::cout << quantized_value << std::endl;
+
+    std::cout << quantizer.from_fpq(quantized_value) << std::endl; // switched back to floating point value
+
+    return 0;
+}
+```
+
+
+
 ## [GPL v3 License](./LICENSE)
 
 Serializer : A modern C++ binary data serializer library. \
